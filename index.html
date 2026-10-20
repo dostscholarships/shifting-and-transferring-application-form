@@ -171,6 +171,12 @@
     background: transparent;
   }
 
+  /* Specific Input Field Styles */
+  .inp-contact {
+    width: 12ch;
+    flex: none;
+  }
+
   /* Field and checkbox interaction states: screen only, so the printed form is unchanged */
   @media screen {
     .inp-line {
@@ -268,7 +274,6 @@
   .matrix-v-line {
     width: 1px;
     height: 54px;
-    /* a border (not a background) so the line still prints when "Background graphics" is off */
     border-left: 1px solid var(--line-black);
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
@@ -413,8 +418,6 @@
     text-align: center;
   }
 
-  /* Native date input is only an invisible anchor for the calendar popup,
-     so none of its "mm/dd/yyyy" text can show as a stray character */
   .picker-date {
     position: absolute;
     right: 0;
@@ -519,7 +522,6 @@
     outline-offset: 0;
   }
 
-  /* Interactive controls for screen mode */
   .floating-img-wrapper .btn-delete {
     position: absolute;
     top: -11px;
@@ -564,7 +566,6 @@
     display: block;
   }
 
-  /* Drop target highlight while dragging files over the form (screen only) */
   .paper.drop-active::after {
     content: "Drop images or signatures here";
     position: absolute;
@@ -582,7 +583,6 @@
     z-index: 300;
   }
 
-  /* Toolbar and action buttons (screen only): slim fixed rail on the left, never covers the form */
   .btn-bar {
     position: fixed;
     top: 16px;
@@ -636,7 +636,6 @@
   .btn-secondary { background-color: #ffffff; color: var(--accent); border-color: var(--ui-border); }
   .btn-secondary:hover { background-color: var(--accent-soft); border-color: var(--accent); }
 
-  /* Narrow screens: reserve room for the rail and scroll sideways instead of clipping the form */
   @media screen and (max-width: 1087px) {
     body { align-items: flex-start; padding-left: 140px; }
   }
@@ -645,7 +644,6 @@
     * { transition: none !important; }
   }
 
-  /* Course dropdown: looks like the other form lines, with a polished menu on screen */
   .dd {
     flex: 1;
     position: relative;
@@ -747,7 +745,6 @@
   .dd-clear:hover { background: #f1f5f9; color: #0f172a; }
   .dd-clear:focus-visible { outline: none; box-shadow: inset 0 0 0 2px var(--accent); }
 
-  /* Custom calendar popup (screen only) */
   .cal-pop {
     position: fixed;
     z-index: 1000;
@@ -803,7 +800,6 @@
   .cal-foot button:hover { background: var(--accent-soft); }
   .cal-foot .cal-clear { color: #64748b; }
 
-  /* Precise Print Rules for Philippine Legal */
   @media print {
     html, body {
       width: 8.5in;
@@ -833,7 +829,6 @@
       box-shadow: none !important;
       border-bottom-color: var(--line-black) !important;
     }
-    /* Hide the "Month DD, YYYY" hint in print; a date the user entered still prints */
     .inp-line::placeholder {
       color: transparent !important;
       opacity: 0 !important;
@@ -890,7 +885,7 @@
     <!-- Row 2: Contact Number & Email Address -->
     <div class="form-row">
       <span class="lbl">Contact Number:</span>
-      <input type="text" class="inp-line">
+      <input type="text" class="inp-line inp-contact" maxlength="12">
       <span class="lbl" style="margin-left: 14px;">Email Address:</span>
       <input type="text" class="inp-line">
     </div>
@@ -1101,7 +1096,6 @@
 <input type="file" id="pngUploader" accept="image/*" multiple style="display: none;" onchange="handleMultipleImages(event)">
 
 <script>
-  // Format Date Picker to Month DD, YYYY
   function formatDate(picker) {
     if (!picker.value) return;
     const parts = picker.value.split('-');
@@ -1119,7 +1113,6 @@
     }
   }
 
-  // Course dropdowns (alphabetical, no placeholder text)
   (function () {
     const COURSES = [
       'BS Biology',
@@ -1205,7 +1198,6 @@
     document.querySelectorAll('.dd').forEach(initDropdown);
   })();
 
-  // Custom calendar popup, opened from the icon button next to each Date field
   const CAL_MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   const CAL_DOW = ['Su','Mo','Tu','We','Th','Fr','Sa'];
   const CAL_CHEV_L = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>';
@@ -1288,7 +1280,6 @@
 
   function calMoveFocus(days, months) {
     const d = new Date(calFocus.getFullYear(), calFocus.getMonth() + months, calFocus.getDate() + days);
-    // keep the day in range when jumping by month (e.g. Jan 31 -> Feb 28)
     if (months && d.getDate() !== calFocus.getDate() && !days) d.setDate(0);
     calFocus = calDay(d);
     calView = new Date(calFocus.getFullYear(), calFocus.getMonth(), 1);
@@ -1353,7 +1344,6 @@
     calRender(true);
   }
 
-  // Trigger file uploader allowing multiple images
   function triggerImageUpload() {
     document.getElementById('pngUploader').click();
   }
@@ -1363,11 +1353,10 @@
     if (!files || files.length === 0) return;
 
     Array.from(files).forEach((file, idx) => {
-      // Offset multiple uploaded images slightly so they don't overlap completely
       addImageFile(file, 500 + (idx * 20), 150 + (idx * 20));
     });
 
-    event.target.value = ''; // Reset input
+    event.target.value = '';
   }
 
   function addImageFile(file, top, left) {
@@ -1386,7 +1375,6 @@
     el.style.top = clamp(y, 0, paper.offsetHeight - el.offsetHeight) + 'px';
   }
 
-  // Create a movable, resizable floating image container
   function createMovableImage(src, topPos = 500, leftPos = 150) {
     const wrapper = document.createElement('div');
     wrapper.className = 'floating-img-wrapper selected';
@@ -1397,7 +1385,6 @@
     const img = document.createElement('img');
     img.alt = '';
     img.draggable = false;
-    // Match the box to the picture's own proportions once it has loaded
     img.onload = function() {
       if (img.naturalWidth && img.naturalHeight) {
         wrapper.style.height = (140 * img.naturalHeight / img.naturalWidth) + 'px';
@@ -1433,7 +1420,6 @@
     deselectAllExcept(wrapper);
   }
 
-  // Make an element Drag-Movable (mouse, touch, pen) and Bottom-Right Resizable
   function makeElementInteractive(elmnt, resizeHandle) {
     let startX, startY, origLeft, origTop, dragging = false;
 
@@ -1458,7 +1444,6 @@
     elmnt.addEventListener('pointerup', stopDrag);
     elmnt.addEventListener('pointercancel', stopDrag);
 
-    // Keyboard: arrows nudge (Shift = bigger steps), Delete removes, Escape deselects
     elmnt.addEventListener('keydown', function(e) {
       const step = e.shiftKey ? 10 : 1;
       let dx = 0, dy = 0;
@@ -1474,7 +1459,6 @@
       moveTo(elmnt, elmnt.offsetLeft + dx, elmnt.offsetTop + dy);
     });
 
-    // Resize Handling (keeps the picture's proportions)
     let resizing = false, rStartX, rStartW, rRatio;
 
     resizeHandle.addEventListener('pointerdown', function(e) {
@@ -1507,14 +1491,12 @@
     });
   }
 
-  // Click on background paper deselects floating items
   paper.addEventListener('pointerdown', function(e) {
     if (!e.target.closest('.floating-img-wrapper')) {
       deselectAllExcept(null);
     }
   });
 
-  // Drag & Drop multiple images from computer directly onto document
   let dragDepth = 0;
   const hasFiles = (e) => e.dataTransfer && Array.from(e.dataTransfer.types || []).includes('Files');
 
