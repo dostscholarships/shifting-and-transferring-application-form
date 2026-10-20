@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APPLICATION FOR SHIFTING COURSE / TRANSFERRING SCHOOL</title>
+<style>
+  :root {
+    --line-black: #000000;
+  }
+
+  * {
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  /* Define Philippine Legal Size (8.5 x 13 in) for Print */
+  @page {
+    size: 8.5in 13in portrait;
+    margin: 0;
+  }
+
+  body {
+    background-color: #e2e8f0;
+    margin: 0;
+    padding: 30px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Philippine Legal Paper Container with 1-inch Side Margins */
+  .paper {
+    background: #ffffff;
+    width: 8.5in;
+    min-height: 13in;
+    padding: 0.65in 1in;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.18);
+    position: relative;
+    color: #000000;
+  }
+
+  /* Revision Box Top Right (Left-aligned text) */
+  .rev-box {
+    position: absolute;
+    top: 0.55in;
+    right: 1in;
+    border: 1px solid var(--line-black);
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.2px;
+    background: #fff;
+    text-align: left;
+    line-height: 1.25;
+  }
+
+  /* Header Section */
+  .header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-top: 15px;
+    margin-bottom: 24px;
+  }
+
+  .dost-logo {
+    height: 48px;
+    width: auto;
+    object-fit: contain;
+    margin-bottom: 8px;
+  }
+
+  .header h3 {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.35;
+  }
+
+  .header h3.bold-inst {
+    font-weight: 700;
+  }
+
+  /* Form Title Block */
+  .title-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-left: 20px;
+    margin-top: 20px;
+    margin-bottom: 22px;
+  }
+
+  .title-main {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    margin-bottom: 4px;
+  }
+
+  .title-options {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-left: 38px;
+  }
+
+  .title-cb-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .title-cb-item input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 13px;
+    height: 13px;
+    border: 1px solid #000;
+    outline: none;
+    cursor: pointer;
+    position: relative;
+    margin: 0;
+    flex-shrink: 0;
+  }
+
+  .title-cb-item input[type="checkbox"]:checked::after {
+    content: '✓';
+    position: absolute;
+    top: -3px;
+    left: 1px;
+    font-size: 11px;
+    font-weight: bold;
+  }
+
+  /* Form Line Rows */
+  .form-row {
+    display: flex;
+    align-items: flex-end;
+    margin-bottom: 7px;
+    font-size: 13px;
+    line-height: 1.25;
+  }
+
+  .lbl {
+    white-space: nowrap;
+    padding-right: 4px;
+    font-size: 13px;
+  }
+
+  .inp-line {
+    flex: 1;
+    border: none;
+    border-bottom: 1px solid var(--line-black);
+    outline: none;
+    font-size: 13px;
+    padding: 0 4px 1px 4px;
+    background: transparent;
+  }
+
+  .inp-line:focus {
+    background-color: #f0f9ff;
+  }
+
+  .checkbox-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .cb-item {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: 5px;
+    cursor: pointer;
+    font-size: 13px;
+    line-height: 1.25;
+  }
+
+  .cb-item input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    border: 1px solid #000;
+    outline: none;
+    cursor: pointer;
+    position: relative;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+
+  .cb-item input[type="checkbox"]:checked::after {
+    content: '✓';
+    position: absolute;
+    top: -3px;
+    left: 1px;
+    font-size: 10px;
+    font-weight: bold;
+  }
+
+  /* Matrix Layout strictly conforming to reference image */
+  .matrix-wrapper {
+    display: flex;
+    align-items: center;
+    margin-top: 16px;
+    margin-bottom: 16px;
+    font-size: 13px;
+  }
+
+  .matrix-labels {
+    width: 90px;
+    flex-shrink: 0;
+  }
+
+  .matrix-grid {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .matrix-v-line {
+    width: 1px;
+    height: 54px;
+    background-color: var(--line-black);
+  }
+
+  .col-block {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .ay-block {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+  }
+
+  .ay-block .inp-line {
+    width: 120px;
+    flex: none;
+  }
+
+  /* Reason Section */
+  .reason-container {
+    margin-top: 12px;
+    margin-bottom: 18px;
+  }
+
+  /* Requirements Box */
+  .req-box {
+    border: 1px solid var(--line-black);
+    padding: 10px 14px;
+    margin-top: 16px;
+    margin-bottom: 24px;
+  }
+
+  .req-title {
+    font-size: 12px;
+    font-weight: 700;
+    font-style: italic;
+    margin-bottom: 8px;
+  }
+
+  .req-grid {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 6px 14px;
+    font-size: 12px;
+  }
+
+  .req-grid .cb-item {
+    font-size: 12px;
+    line-height: 1.25;
+    align-items: flex-start;
+  }
+
+  .req-grid .cb-item input[type="checkbox"] {
+    width: 11px;
+    height: 11px;
+    margin-top: 2px;
+  }
+
+  .req-grid .cb-item input[type="checkbox"]:checked::after {
+    top: -3px;
+    left: 1px;
+    font-size: 9px;
+  }
+
+  .req-col {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  /* Signatures Section */
+  .sig-headers-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    margin-top: 18px;
+    margin-bottom: 10px;
+  }
+
+  .sig-block-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 36px;
+  }
+
+  .sig-col-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+  }
+
+  .sig-input-area {
+    width: 100%;
+    height: 42px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    position: relative;
+  }
+
+  .sig-input-area .inp-line {
+    width: 100%;
+    text-align: center;
+  }
+
+  .sig-line {
+    width: 100%;
+    border-top: 1px solid var(--line-black);
+    text-align: center;
+    padding-top: 2px;
+    font-size: 13px;
+  }
+
+  .date-centered {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    margin-top: 6px;
+    font-size: 13px;
+    width: 100%;
+  }
+
+  /* Date Selector Wrapper */
+  .date-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: flex-end;
+    justify-content: center;
+    max-width: 175px;
+    flex: none;
+  }
+
+  .date-wrapper input[type="text"] {
+    width: 100%;
+    text-align: center;
+  }
+
+  .picker-date {
+    margin-left: 2px;
+    width: 22px;
+    height: 18px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    outline: none;
+  }
+
+  /* Separator Double Line */
+  .double-divider {
+    border: none;
+    border-top: 3px double var(--line-black);
+    margin: 26px 0 16px 0;
+  }
+
+  /* Coordinator Section */
+  .coord-header {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .recommendation-block {
+    margin-bottom: 30px;
+  }
+
+  .coord-sig-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    margin-top: 16px;
+  }
+
+  .coord-sig-box {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+  }
+
+  .coord-date-row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    margin-top: 8px;
+    font-size: 13px;
+    width: 100%;
+  }
+
+  /* Movable & Resizable Floating Image Wrapper */
+  .floating-img-wrapper {
+    position: absolute;
+    display: inline-block;
+    cursor: move;
+    user-select: none;
+    z-index: 100;
+  }
+
+  .floating-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    pointer-events: none;
+  }
+
+  .floating-img-wrapper .btn-delete {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 18px;
+    height: 18px;
+    background: #ff4d4f;
+    color: white;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 16px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    display: none;
+  }
+
+  .floating-img-wrapper .resize-handle {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: #004466;
+    border: 1px solid #ffffff;
+    bottom: -5px;
+    right: -5px;
+    cursor: se-resize;
+    display: none;
+  }
+
+  .floating-img-wrapper.selected {
+    outline: 1px dashed #004466;
+  }
+
+  .floating-img-wrapper.selected .btn-delete,
+  .floating-img-wrapper.selected .resize-handle {
+    display: block;
+  }
+
+  /* Action Buttons */
+  .btn-bar {
+    margin-top: 24px;
+    display: flex;
+    gap: 12px;
+  }
+
+  .btn {
+    padding: 10px 24px;
+    background-color: #004466;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .btn:hover {
+    background-color: #002b40;
+  }
+
+  /* Precise Print Rules for Philippine Legal */
+  @media print {
+    html, body {
+      width: 8.5in;
+      height: 13in;
+      background: #fff;
+      margin: 0;
+      padding: 0;
+    }
+    .paper {
+      box-shadow: none;
+      width: 8.5in;
+      min-height: 13in;
+      padding: 0.65in 1in;
+      margin: 0;
+    }
+    .btn-bar, .file-input-btn, .btn-delete, .resize-handle {
+      display: none !important;
+    }
+    .floating-img-wrapper {
+      outline: none !important;
+    }
+    .picker-date {
+      display: none !important;
+    }
+    .date-wrapper {
+      max-width: 155px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="paper" id="paperDoc">
+  <!-- Document Revision Box Top Right (Left-aligned) -->
+  <div class="rev-box">
+    STSD-124<br>Rev.4 / 05-15-24
+  </div>
+
+  <!-- Header Section -->
+  <div class="header">
+    <img src="https://drive.google.com/thumbnail?id=1pqU0q2HoAp8liBybxU-AG-_nH79XMX6q&sz=w500" alt="DOST Logo" class="dost-logo">
+    <h3>Department of Science and Technology</h3>
+    <h3 class="bold-inst">SCIENCE EDUCATION INSTITUTE</h3>
+  </div>
+
+  <!-- Application Checkbox Title Block -->
+  <div class="title-container">
+    <div class="title-main">APPLICATION FOR</div>
+    <div class="title-options">
+      <label class="title-cb-item"><input type="checkbox"> SHIFTING COURSE</label>
+      <label class="title-cb-item"><input type="checkbox"> TRANSFERRING SCHOOL</label>
+    </div>
+  </div>
+
+  <form id="shiftingForm">
+    <!-- Row 1: Name of Scholar -->
+    <div class="form-row">
+      <span class="lbl">Name of Scholar:</span>
+      <input type="text" class="inp-line">
+    </div>
+
+    <!-- Row 2: Contact Number & Email Address -->
+    <div class="form-row">
+      <span class="lbl">Contact Number:</span>
+      <input type="text" class="inp-line">
+      <span class="lbl" style="margin-left: 14px;">Email Address:</span>
+      <input type="text" class="inp-line">
+    </div>
+
+    <!-- Row 3: Year of Award & Scholarship Award -->
+    <div class="form-row">
+      <span class="lbl">Year of Award:</span>
+      <input type="text" class="inp-line" style="max-width: 180px; flex: none;">
+      <span class="lbl" style="margin-left: 14px;">Scholarship Award:</span>
+      <div class="checkbox-group" style="margin-left: 6px;">
+        <label class="cb-item"><input type="checkbox"> Merit</label>
+        <label class="cb-item" style="margin-left: 10px;"><input type="checkbox"> RA 7687</label>
+      </div>
+    </div>
+
+    <!-- Row 4: Original Course -->
+    <div class="form-row">
+      <span class="lbl">Original Course:</span>
+      <input type="text" class="inp-line">
+    </div>
+
+    <!-- Row 5: Original School -->
+    <div class="form-row">
+      <span class="lbl">Original School:</span>
+      <input type="text" class="inp-line">
+    </div>
+
+    <!-- Row 6: Year Level Prior Shift/Transfer -->
+    <div class="form-row">
+      <span class="lbl">Year Level Prior Shift/Transfer:</span>
+      <input type="text" class="inp-line">
+    </div>
+
+    <!-- Row 7: If shifting, New Course -->
+    <div class="form-row">
+      <span class="lbl">If shifting, New Course:</span>
+      <input type="text" class="inp-line">
+    </div>
+
+    <!-- Row 8: If transferring, New School -->
+    <div class="form-row">
+      <span class="lbl">If transferring, New School:</span>
+      <input type="text" class="inp-line">
+    </div>
+
+    <br>
+
+    <!-- Matrix: Conforming Effective Layout -->
+    <div class="matrix-wrapper">
+      <div class="matrix-labels">
+        <span>Effective:</span>
+      </div>
+
+      <div class="matrix-grid">
+        <!-- Col 1: Term options -->
+        <div class="col-block">
+          <label class="cb-item"><input type="checkbox"> Intersession</label>
+          <label class="cb-item"><input type="checkbox"> Second</label>
+          <label class="cb-item"><input type="checkbox"> First</label>
+        </div>
+
+        <!-- Col 2: Third/Fourth -->
+        <div class="col-block">
+          <label class="cb-item"><input type="checkbox"> Third</label>
+          <label class="cb-item"><input type="checkbox"> Fourth</label>
+        </div>
+
+        <!-- Divider 1 -->
+        <div class="matrix-v-line"></div>
+
+        <!-- Col 3: Semester/Trimester -->
+        <div class="col-block">
+          <label class="cb-item"><input type="checkbox"> Semester</label>
+          <label class="cb-item"><input type="checkbox"> Trimester</label>
+        </div>
+
+        <!-- Col 4: Quarter Term -->
+        <div class="col-block">
+          <label class="cb-item"><input type="checkbox"> Quarter Term</label>
+        </div>
+
+        <!-- Divider 2 -->
+        <div class="matrix-v-line"></div>
+
+        <!-- Col 5: AY Block -->
+        <div class="ay-block">
+          <span>AY</span>
+          <input type="text" class="inp-line">
+        </div>
+      </div>
+    </div>
+
+    <!-- Reason Section -->
+    <div class="reason-container">
+      <div class="form-row">
+        <span class="lbl">Reason for Shifting/Transferring:</span>
+        <input type="text" class="inp-line">
+      </div>
+      <div class="form-row" style="margin-top: 6px;">
+        <input type="text" class="inp-line">
+      </div>
+      <div class="form-row" style="margin-top: 6px;">
+        <input type="text" class="inp-line">
+      </div>
+    </div>
+
+    <!-- Requirements Box -->
+    <div class="req-box">
+      <div class="req-title">Please attach the following requirements to this application:</div>
+      <div class="req-grid">
+        <div class="req-col">
+          <label class="cb-item"><input type="checkbox"> Certification of Admission in New Course/School</label>
+          <label class="cb-item"><input type="checkbox"> Certification of Year Level in New Course/School</label>
+          <label class="cb-item"><input type="checkbox"> Certification of Grades in all Semesters Enrolled</label>
+        </div>
+        <div class="req-col">
+          <label class="cb-item"><input type="checkbox"> Approved Program of Study/Curriculum in New Course/School</label>
+          <label class="cb-item"><input type="checkbox"> Breakdown of Financial Assistance, if applicable</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Submitted by / Noted by Row -->
+    <div class="sig-headers-row">
+      <span>Submitted by:</span>
+      <span style="margin-right: 170px;">Noted by:</span>
+    </div>
+
+    <!-- Signatures: Scholar & Parent -->
+    <div class="sig-block-grid">
+      <div class="sig-col-item">
+        <div class="sig-input-area" id="sigAreaScholar">
+          <input type="text" class="inp-line" placeholder="">
+        </div>
+        <div class="sig-line">Printed Name/Signature of Scholar</div>
+        <div class="date-centered">
+          <span class="lbl">Date:</span>
+          <div class="date-wrapper">
+            <input type="text" class="inp-line text-date" placeholder="Month DD, YYYY">
+            <input type="date" class="picker-date" onchange="formatDate(this)">
+          </div>
+        </div>
+      </div>
+
+      <div class="sig-col-item">
+        <div class="sig-input-area" id="sigAreaParent">
+          <input type="text" class="inp-line" placeholder="">
+        </div>
+        <div class="sig-line">Printed Name/Signature of Parent</div>
+        <div class="date-centered">
+          <span class="lbl">Date:</span>
+          <div class="date-wrapper">
+            <input type="text" class="inp-line text-date" placeholder="Month DD, YYYY">
+            <input type="date" class="picker-date" onchange="formatDate(this)">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Separator Double Line -->
+    <hr class="double-divider">
+
+    <!-- University Coordinator Section -->
+    <div class="coord-header">To be accomplished by the University Coordinator (if applicable)</div>
+    
+    <div class="recommendation-block">
+      <div class="form-row">
+        <span class="lbl">Recommendation:</span>
+        <input type="text" class="inp-line">
+      </div>
+      <div class="form-row" style="margin-top: 8px;">
+        <input type="text" class="inp-line">
+      </div>
+    </div>
+
+    <div class="coord-sig-wrapper">
+      <div class="coord-sig-box">
+        <div class="sig-input-area" id="sigAreaCoord" style="width: 100%;">
+          <input type="text" class="inp-line" placeholder="">
+        </div>
+        <div class="sig-line">Printed Name/Signature of University Coordinator</div>
+        <div class="coord-date-row">
+          <span class="lbl">Date:</span>
+          <div class="date-wrapper">
+            <input type="text" class="inp-line text-date" placeholder="Month DD, YYYY">
+            <input type="date" class="picker-date" onchange="formatDate(this)">
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<!-- Hidden File Input for Image Uploads -->
+<input type="file" id="pngUploader" accept="image/*" multiple style="display: none;" onchange="handleMultipleImages(event)">
+
+<!-- Action Buttons -->
+<div class="btn-bar">
+  <button class="btn" onclick="triggerImageUpload()">Upload Pictures / Signatures</button>
+  <button class="btn" onclick="window.print()">Print or Save as PDF</button>
+</div>
+
+<script>
+  // Format Date Picker to Month DD, YYYY
+  function formatDate(picker) {
+    if (!picker.value) return;
+    const parts = picker.value.split('-');
+    const dateObj = new Date(parts[0], parts[1] - 1, parts[2]);
+    
+    const formatted = dateObj.toLocaleDateString('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric'
+    });
+    
+    const textInput = picker.parentElement.querySelector('.text-date');
+    if (textInput) {
+      textInput.value = formatted;
+    }
+  }
+
+  // Trigger file uploader allowing multiple images
+  function triggerImageUpload() {
+    document.getElementById('pngUploader').click();
+  }
+
+  function handleMultipleImages(event) {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    Array.from(files).forEach((file, idx) => {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const initialTop = 500 + (idx * 20);
+        const initialLeft = 150 + (idx * 20);
+        createMovableImage(e.target.result, initialTop, initialLeft);
+      };
+      reader.readAsDataURL(file);
+    });
+
+    event.target.value = '';
+  }
+
+  // Create a movable, resizable floating image container
+  function createMovableImage(src, topPos = 500, leftPos = 150) {
+    const paper = document.getElementById('paperDoc');
+    
+    const wrapper = document.createElement('div');
+    wrapper.className = 'floating-img-wrapper selected';
+    wrapper.style.top = topPos + 'px';
+    wrapper.style.left = leftPos + 'px';
+    wrapper.style.width = '140px';
+    wrapper.style.height = '80px';
+
+    const img = document.createElement('img');
+    img.src = src;
+
+    const delBtn = document.createElement('div');
+    delBtn.className = 'btn-delete';
+    delBtn.innerText = '×';
+    delBtn.onclick = (e) => {
+      e.stopPropagation();
+      wrapper.remove();
+    };
+
+    const resizeHandle = document.createElement('div');
+    resizeHandle.className = 'resize-handle';
+
+    wrapper.appendChild(img);
+    wrapper.appendChild(delBtn);
+    wrapper.appendChild(resizeHandle);
+    paper.appendChild(wrapper);
+
+    makeElementInteractive(wrapper, resizeHandle);
+    deselectAllExcept(wrapper);
+  }
+
+  // Drag & Resize Handling
+  function makeElementInteractive(elmnt, resizeHandle) {
+    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+
+    elmnt.addEventListener('mousedown', function(e) {
+      if (e.target.classList.contains('btn-delete') || e.target.classList.contains('resize-handle')) return;
+      deselectAllExcept(elmnt);
+      elmnt.classList.add('selected');
+
+      e.preventDefault();
+      pos3 = e.clientX;
+      pos4 = e.clientY;
+
+      document.onmousemove = elementDrag;
+      document.onmouseup = closeDragElement;
+    });
+
+    function elementDrag(e) {
+      e.preventDefault();
+      pos1 = pos3 - e.clientX;
+      pos2 = pos4 - e.clientY;
+      pos3 = e.clientX;
+      pos4 = e.clientY;
+
+      elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+      elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+    }
+
+    function closeDragElement() {
+      document.onmousemove = null;
+      document.onmouseup = null;
+    }
+
+    resizeHandle.addEventListener('mousedown', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      let startX = e.clientX;
+      let startY = e.clientY;
+      let startWidth = parseInt(document.defaultView.getComputedStyle(elmnt).width, 10);
+      let startHeight = parseInt(document.defaultView.getComputedStyle(elmnt).height, 10);
+
+      function doResize(re) {
+        elmnt.style.width = (startWidth + re.clientX - startX) + 'px';
+        elmnt.style.height = (startHeight + re.clientY - startY) + 'px';
+      }
+
+      function stopResize() {
+        document.removeEventListener('mousemove', doResize);
+        document.removeEventListener('mouseup', stopResize);
+      }
+
+      document.addEventListener('mousemove', doResize);
+      document.addEventListener('mouseup', stopResize);
+    });
+  }
+
+  function deselectAllExcept(target) {
+    document.querySelectorAll('.floating-img-wrapper').forEach(el => {
+      if (el !== target) el.classList.remove('selected');
+    });
+  }
+
+  document.getElementById('paperDoc').addEventListener('mousedown', function(e) {
+    if (!e.target.closest('.floating-img-wrapper')) {
+      deselectAllExcept(null);
+    }
+  });
+
+  const paper = document.getElementById('paperDoc');
+
+  paper.addEventListener('dragover', (e) => e.preventDefault());
+
+  paper.addEventListener('drop', (e) => {
+    e.preventDefault();
+    const files = e.dataTransfer.files;
+    if (!files || files.length === 0) return;
+
+    const rect = paper.getBoundingClientRect();
+    const dropX = e.clientX - rect.left;
+    const dropY = e.clientY - rect.top;
+
+    Array.from(files).forEach((file, i) => {
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          createMovableImage(event.target.result, dropY + (i * 15), dropX + (i * 15));
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
