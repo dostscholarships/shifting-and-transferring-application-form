@@ -30,10 +30,20 @@
     background-image: linear-gradient(180deg, #e6ebf1 0%, #d3dbe4 100%);
     background-attachment: fixed;
     margin: 0;
-    padding: 30px 0 48px;
+    padding: 30px 16px 48px;
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Workspace Container - Outer Flexbox placing paper & toolbar side by side */
+  .workspace {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    width: max-content;
+    margin: 0 auto;
   }
 
   /* Philippine Legal Paper Container with 1-inch Side Margins */
@@ -45,6 +55,7 @@
     box-shadow: 0 1px 2px rgba(15,23,42,0.10), 0 8px 28px rgba(15,23,42,0.16), 0 24px 60px rgba(15,23,42,0.10);
     position: relative;
     color: #000000;
+    flex-shrink: 0;
   }
 
   /* Revision Box Top Right (Left-aligned text) */
@@ -491,7 +502,7 @@
     width: 100%;
   }
 
-  /* Movable & Resizable Floating Image Wrapper */
+  /* Movable, Resizable & Rotatable Floating Image Wrapper */
   .floating-img-wrapper {
     position: absolute;
     display: block;
@@ -500,6 +511,7 @@
     -webkit-user-select: none;
     touch-action: none;
     z-index: 100;
+    transform: rotate(var(--rot, 0deg));
   }
 
   .floating-img-wrapper.dragging { cursor: grabbing; z-index: 150; }
@@ -559,11 +571,47 @@
     display: none;
   }
 
+  .floating-img-wrapper .rotate-handle {
+    position: absolute;
+    top: -34px;
+    left: 50%;
+    width: 22px;
+    height: 22px;
+    margin-left: -11px;
+    padding: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent);
+    color: #ffffff;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    cursor: grab;
+    box-shadow: 0 1px 4px rgba(15,23,42,0.35);
+    touch-action: none;
+  }
+  .floating-img-wrapper .rotate-handle::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    width: 1.5px;
+    height: 12px;
+    margin-left: -0.75px;
+    background: var(--accent);
+  }
+  .floating-img-wrapper .rotate-handle svg { width: 12px; height: 12px; pointer-events: none; }
+  .floating-img-wrapper .rotate-handle:active { cursor: grabbing; }
+
   .floating-img-wrapper.selected .btn-delete,
   .floating-img-wrapper.selected .resize-handle,
   .floating-img-wrapper:focus-within .btn-delete,
   .floating-img-wrapper:focus-within .resize-handle {
     display: block;
+  }
+  .floating-img-wrapper.selected .rotate-handle,
+  .floating-img-wrapper:focus-within .rotate-handle {
+    display: flex;
   }
 
   .paper.drop-active::after {
@@ -583,12 +631,12 @@
     z-index: 300;
   }
 
+  /* Action Buttons Toolbar placed cleanly on the Right Side */
   .btn-bar {
-    position: fixed;
+    position: sticky;
     top: 16px;
-    left: 16px;
-    z-index: 200;
-    width: 108px;
+    flex: none;
+    width: 120px;
     padding: 8px;
     display: flex;
     flex-direction: column;
@@ -599,6 +647,7 @@
     border: 1px solid var(--ui-border);
     border-radius: 16px;
     box-shadow: 0 1px 2px rgba(15,23,42,0.08), 0 8px 24px rgba(15,23,42,0.12);
+    z-index: 20;
   }
 
   .btn-bar, .btn-bar * {
@@ -635,10 +684,6 @@
 
   .btn-secondary { background-color: #ffffff; color: var(--accent); border-color: var(--ui-border); }
   .btn-secondary:hover { background-color: var(--accent-soft); border-color: var(--accent); }
-
-  @media screen and (max-width: 1087px) {
-    body { align-items: flex-start; padding-left: 140px; }
-  }
 
   @media (prefers-reduced-motion: reduce) {
     * { transition: none !important; }
@@ -808,6 +853,10 @@
       margin: 0;
       padding: 0;
     }
+    .workspace {
+      display: block;
+      width: auto;
+    }
     .paper {
       box-shadow: none;
       width: 8.5in;
@@ -815,11 +864,12 @@
       padding: 0.65in 1in;
       margin: 0;
     }
-    .btn-bar, .file-input-btn, .btn-delete, .resize-handle {
+    .btn-bar, .file-input-btn, .btn-delete, .resize-handle, .rotate-handle {
       display: none !important;
     }
     .floating-img-wrapper {
       outline: none !important;
+      transform: rotate(var(--rot, 0deg));
     }
     .picker-date, .picker-btn, .cal-pop, .dd-caret, .dd-menu {
       display: none !important;
@@ -841,255 +891,258 @@
 </head>
 <body>
 
-<!-- Action Buttons -->
-<div class="btn-bar" role="toolbar" aria-label="Form actions">
-  <button type="button" class="btn btn-secondary" onclick="triggerImageUpload()" title="Upload pictures or signatures. You can also drop images onto the form, drag to move, and pull the corner to resize." aria-label="Upload pictures or signatures">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-    <span class="btn-label">UPLOAD</span>
-  </button>
-  <button type="button" class="btn" onclick="window.print()" title="Print or save the form as a PDF" aria-label="Print or download as PDF">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-    <span class="btn-label">PRINT/<wbr>DOWNLOAD</span>
-  </button>
-</div>
-
-<div class="paper" id="paperDoc">
-  <!-- Document Revision Box Top Right (Left-aligned) -->
-  <div class="rev-box">
-    STSD-124<br>Rev.4 / 05-15-24
-  </div>
-
-  <!-- Header Section -->
-  <div class="header">
-    <img src="https://lh3.googleusercontent.com/d/1pqU0q2HoAp8liBybxU-AG-_nH79XMX6q=w500" data-fallbacks="https://drive.google.com/thumbnail?id=1pqU0q2HoAp8liBybxU-AG-_nH79XMX6q&amp;sz=w500|https://drive.google.com/uc?export=view&amp;id=1pqU0q2HoAp8liBybxU-AG-_nH79XMX6q" onerror="var f=(this.dataset.fallbacks||'').split('|').filter(Boolean);if(f.length){this.dataset.fallbacks=f.slice(1).join('|');this.src=f[0];}" alt="DOST Logo" class="dost-logo">
-    <h3>Department of Science and Technology</h3>
-    <h3 class="bold-inst">SCIENCE EDUCATION INSTITUTE</h3>
-  </div>
-
-  <!-- Application Checkbox Title Block -->
-  <div class="title-container">
-    <div class="title-main">APPLICATION FOR</div>
-    <div class="title-options">
-      <label class="title-cb-item"><input type="checkbox"> SHIFTING COURSE</label>
-      <label class="title-cb-item"><input type="checkbox"> TRANSFERRING SCHOOL</label>
-    </div>
-  </div>
-
-  <form id="shiftingForm">
-    <!-- Row 1: Name of Scholar -->
-    <div class="form-row">
-      <span class="lbl">Name of Scholar:</span>
-      <input type="text" class="inp-line">
+<div class="workspace">
+  <!-- Document Paper Container -->
+  <div class="paper" id="paperDoc">
+    <!-- Document Revision Box Top Right (Left-aligned) -->
+    <div class="rev-box">
+      STSD-124<br>Rev.4 / 05-15-24
     </div>
 
-    <!-- Row 2: Contact Number & Email Address -->
-    <div class="form-row">
-      <span class="lbl">Contact Number:</span>
-      <input type="text" class="inp-line inp-contact" maxlength="12">
-      <span class="lbl" style="margin-left: 14px;">Email Address:</span>
-      <input type="text" class="inp-line">
+    <!-- Header Section -->
+    <div class="header">
+      <img src="https://lh3.googleusercontent.com/d/1pqU0q2HoAp8liBybxU-AG-_nH79XMX6q=w500" data-fallbacks="https://drive.google.com/thumbnail?id=1pqU0q2HoAp8liBybxU-AG-_nH79XMX6q&amp;sz=w500|https://drive.google.com/uc?export=view&amp;id=1pqU0q2HoAp8liBybxU-AG-_nH79XMX6q" onerror="var f=(this.dataset.fallbacks||'').split('|').filter(Boolean);if(f.length){this.dataset.fallbacks=f.slice(1).join('|');this.src=f[0];}" alt="DOST Logo" class="dost-logo">
+      <h3>Department of Science and Technology</h3>
+      <h3 class="bold-inst">SCIENCE EDUCATION INSTITUTE</h3>
     </div>
 
-    <!-- Row 3: Year of Award & Scholarship Award -->
-    <div class="form-row">
-      <span class="lbl">Year of Award:</span>
-      <input type="text" class="inp-line" style="max-width: 180px; flex: none;">
-      <span class="lbl" style="margin-left: 14px;">Scholarship Award:</span>
-      <div class="checkbox-group" style="margin-left: 6px;">
-        <label class="cb-item"><input type="checkbox"> Merit</label>
-        <label class="cb-item" style="margin-left: 10px;"><input type="checkbox"> RA 7687</label>
+    <!-- Application Checkbox Title Block -->
+    <div class="title-container">
+      <div class="title-main">APPLICATION FOR</div>
+      <div class="title-options">
+        <label class="title-cb-item"><input type="checkbox"> SHIFTING COURSE</label>
+        <label class="title-cb-item"><input type="checkbox"> TRANSFERRING SCHOOL</label>
       </div>
     </div>
 
-    <!-- Row 4: Original Course -->
-    <div class="form-row">
-      <span class="lbl" id="origCourseLbl">Original Course:</span>
-      <div class="dd" id="origCourseDD" data-label="Original Course">
-        <button type="button" class="dd-btn" id="origCourseBtn" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="origCourseLbl origCourseBtn">
-          <span class="dd-text"></span>
-          <svg class="dd-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-        </button>
-      </div>
-    </div>
-
-    <!-- Row 5: Original School -->
-    <div class="form-row">
-      <span class="lbl">Original School:</span>
-      <input type="text" class="inp-line">
-    </div>
-
-    <!-- Row 6: Year Level Prior Shift/Transfer -->
-    <div class="form-row">
-      <span class="lbl">Year Level Prior Shift/Transfer:</span>
-      <input type="text" class="inp-line">
-    </div>
-
-    <!-- Row 7: If shifting, New Course -->
-    <div class="form-row">
-      <span class="lbl" id="newCourseLbl">If shifting, New Course:</span>
-      <div class="dd" id="newCourseDD" data-label="New Course">
-        <button type="button" class="dd-btn" id="newCourseBtn" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="newCourseLbl newCourseBtn">
-          <span class="dd-text"></span>
-          <svg class="dd-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-        </button>
-      </div>
-    </div>
-
-    <!-- Row 8: If transferring, New School -->
-    <div class="form-row">
-      <span class="lbl">If transferring, New School:</span>
-      <input type="text" class="inp-line">
-    </div>
-
-    <br>
-
-    <!-- Matrix: Conforming Effective Layout -->
-    <div class="matrix-wrapper">
-      <div class="matrix-labels">
-        <span>Effective:</span>
+    <form id="shiftingForm">
+      <!-- Row 1: Name of Scholar -->
+      <div class="form-row">
+        <span class="lbl">Name of Scholar:</span>
+        <input type="text" class="inp-line">
       </div>
 
-      <div class="matrix-grid">
-        <!-- Col 1: Term options -->
-        <div class="col-block">
-          <label class="cb-item"><input type="checkbox"> Intersession</label>
-          <label class="cb-item"><input type="checkbox"> Second</label>
-          <label class="cb-item"><input type="checkbox"> First</label>
+      <!-- Row 2: Contact Number & Email Address -->
+      <div class="form-row">
+        <span class="lbl">Contact Number:</span>
+        <input type="text" class="inp-line inp-contact" maxlength="12">
+        <span class="lbl" style="margin-left: 14px;">Email Address:</span>
+        <input type="text" class="inp-line">
+      </div>
+
+      <!-- Row 3: Year of Award & Scholarship Award -->
+      <div class="form-row">
+        <span class="lbl">Year of Award:</span>
+        <input type="text" class="inp-line" style="max-width: 180px; flex: none;">
+        <span class="lbl" style="margin-left: 14px;">Scholarship Award:</span>
+        <div class="checkbox-group" style="margin-left: 6px;">
+          <label class="cb-item"><input type="checkbox"> Merit</label>
+          <label class="cb-item" style="margin-left: 10px;"><input type="checkbox"> RA 7687</label>
+        </div>
+      </div>
+
+      <!-- Row 4: Original Course -->
+      <div class="form-row">
+        <span class="lbl" id="origCourseLbl">Original Course:</span>
+        <div class="dd" id="origCourseDD" data-label="Original Course">
+          <button type="button" class="dd-btn" id="origCourseBtn" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="origCourseLbl origCourseBtn">
+            <span class="dd-text"></span>
+            <svg class="dd-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Row 5: Original School -->
+      <div class="form-row">
+        <span class="lbl">Original School:</span>
+        <input type="text" class="inp-line">
+      </div>
+
+      <!-- Row 6: Year Level Prior Shift/Transfer -->
+      <div class="form-row">
+        <span class="lbl">Year Level Prior Shift/Transfer:</span>
+        <input type="text" class="inp-line">
+      </div>
+
+      <!-- Row 7: If shifting, New Course -->
+      <div class="form-row">
+        <span class="lbl" id="newCourseLbl">If shifting, New Course:</span>
+        <div class="dd" id="newCourseDD" data-label="New Course">
+          <button type="button" class="dd-btn" id="newCourseBtn" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="newCourseLbl newCourseBtn">
+            <span class="dd-text"></span>
+            <svg class="dd-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Row 8: If transferring, New School -->
+      <div class="form-row">
+        <span class="lbl">If transferring, New School:</span>
+        <input type="text" class="inp-line">
+      </div>
+
+      <br>
+
+      <!-- Matrix: Conforming Effective Layout -->
+      <div class="matrix-wrapper">
+        <div class="matrix-labels">
+          <span>Effective:</span>
         </div>
 
-        <!-- Col 2: Third/Fourth -->
-        <div class="col-block">
-          <label class="cb-item"><input type="checkbox"> Third</label>
-          <label class="cb-item"><input type="checkbox"> Fourth</label>
+        <div class="matrix-grid">
+          <!-- Col 1: Term options -->
+          <div class="col-block">
+            <label class="cb-item"><input type="checkbox"> Intersession</label>
+            <label class="cb-item"><input type="checkbox"> Second</label>
+            <label class="cb-item"><input type="checkbox"> First</label>
+          </div>
+
+          <!-- Col 2: Third/Fourth -->
+          <div class="col-block">
+            <label class="cb-item"><input type="checkbox"> Third</label>
+            <label class="cb-item"><input type="checkbox"> Fourth</label>
+          </div>
+
+          <!-- Divider 1 -->
+          <div class="matrix-v-line"></div>
+
+          <!-- Col 3: Semester/Trimester -->
+          <div class="col-block">
+            <label class="cb-item"><input type="checkbox"> Semester</label>
+            <label class="cb-item"><input type="checkbox"> Trimester</label>
+          </div>
+
+          <!-- Col 4: Quarter Term -->
+          <div class="col-block">
+            <label class="cb-item"><input type="checkbox"> Quarter Term</label>
+          </div>
+
+          <!-- Divider 2 -->
+          <div class="matrix-v-line"></div>
+
+          <!-- Col 5: AY Block -->
+          <div class="ay-block">
+            <span>AY</span>
+            <input type="text" class="inp-line">
+          </div>
         </div>
+      </div>
 
-        <!-- Divider 1 -->
-        <div class="matrix-v-line"></div>
-
-        <!-- Col 3: Semester/Trimester -->
-        <div class="col-block">
-          <label class="cb-item"><input type="checkbox"> Semester</label>
-          <label class="cb-item"><input type="checkbox"> Trimester</label>
+      <!-- Reason Section -->
+      <div class="reason-container">
+        <div class="form-row">
+          <span class="lbl">Reason for Shifting/Transferring:</span>
+          <input type="text" class="inp-line">
         </div>
-
-        <!-- Col 4: Quarter Term -->
-        <div class="col-block">
-          <label class="cb-item"><input type="checkbox"> Quarter Term</label>
+        <div class="form-row" style="margin-top: 6px;">
+          <input type="text" class="inp-line">
         </div>
-
-        <!-- Divider 2 -->
-        <div class="matrix-v-line"></div>
-
-        <!-- Col 5: AY Block -->
-        <div class="ay-block">
-          <span>AY</span>
+        <div class="form-row" style="margin-top: 6px;">
           <input type="text" class="inp-line">
         </div>
       </div>
-    </div>
 
-    <!-- Reason Section -->
-    <div class="reason-container">
-      <div class="form-row">
-        <span class="lbl">Reason for Shifting/Transferring:</span>
-        <input type="text" class="inp-line">
-      </div>
-      <div class="form-row" style="margin-top: 6px;">
-        <input type="text" class="inp-line">
-      </div>
-      <div class="form-row" style="margin-top: 6px;">
-        <input type="text" class="inp-line">
-      </div>
-    </div>
-
-    <!-- Requirements Box -->
-    <div class="req-box">
-      <div class="req-title">Please attach the following requirements to this application:</div>
-      <div class="req-grid">
-        <div class="req-col">
-          <label class="cb-item"><input type="checkbox"> Certification of Admission in New Course/School</label>
-          <label class="cb-item"><input type="checkbox"> Certification of Year Level in New Course/School</label>
-          <label class="cb-item"><input type="checkbox"> Certification of Grades in all Semesters Enrolled</label>
-        </div>
-        <div class="req-col">
-          <label class="cb-item"><input type="checkbox"> Approved Program of Study/Curriculum in New Course/School</label>
-          <label class="cb-item"><input type="checkbox"> Breakdown of Financial Assistance, if applicable</label>
-        </div>
-      </div>
-    </div>
-
-    <!-- Submitted by / Noted by Row -->
-    <div class="sig-headers-row">
-      <span>Submitted by:</span>
-      <span style="margin-right: 170px;">Noted by:</span>
-    </div>
-
-    <!-- Signatures: Scholar & Parent -->
-    <div class="sig-block-grid">
-      <div class="sig-col-item">
-        <div class="sig-input-area" id="sigAreaScholar">
-          <input type="text" class="inp-line" placeholder="">
-        </div>
-        <div class="sig-line">Printed Name/Signature of Scholar</div>
-        <div class="date-centered">
-          <span class="lbl">Date:</span>
-          <div class="date-wrapper">
-            <input type="text" class="inp-line text-date" placeholder="Month DD, YYYY">
-            <input type="date" class="picker-date" onchange="formatDate(this)" tabindex="-1" aria-hidden="true">
-            <button type="button" class="picker-btn" onclick="openDatePicker(this)" aria-label="Pick a date" title="Pick a date"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></button>
+      <!-- Requirements Box -->
+      <div class="req-box">
+        <div class="req-title">Please attach the following requirements to this application:</div>
+        <div class="req-grid">
+          <div class="req-col">
+            <label class="cb-item"><input type="checkbox"> Certification of Admission in New Course/School</label>
+            <label class="cb-item"><input type="checkbox"> Certification of Year Level in New Course/School</label>
+            <label class="cb-item"><input type="checkbox"> Certification of Grades in all Semesters Enrolled</label>
+          </div>
+          <div class="req-col">
+            <label class="cb-item"><input type="checkbox"> Approved Program of Study/Curriculum in New Course/School</label>
+            <label class="cb-item"><input type="checkbox"> Breakdown of Financial Assistance, if applicable</label>
           </div>
         </div>
       </div>
 
-      <div class="sig-col-item">
-        <div class="sig-input-area" id="sigAreaParent">
-          <input type="text" class="inp-line" placeholder="">
+      <!-- Submitted by / Noted by Row -->
+      <div class="sig-headers-row">
+        <span>Submitted by:</span>
+        <span style="margin-right: 170px;">Noted by:</span>
+      </div>
+
+      <!-- Signatures: Scholar & Parent -->
+      <div class="sig-block-grid">
+        <div class="sig-col-item">
+          <div class="sig-input-area" id="sigAreaScholar">
+            <input type="text" class="inp-line" placeholder="">
+          </div>
+          <div class="sig-line">Printed Name/Signature of Scholar</div>
+          <div class="date-centered">
+            <span class="lbl">Date:</span>
+            <div class="date-wrapper">
+              <input type="text" class="inp-line text-date" placeholder="Month DD, YYYY">
+              <input type="date" class="picker-date" onchange="formatDate(this)" tabindex="-1" aria-hidden="true">
+              <button type="button" class="picker-btn" onclick="openDatePicker(this)" aria-label="Pick a date" title="Pick a date"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></button>
+            </div>
+          </div>
         </div>
-        <div class="sig-line">Printed Name/Signature of Parent</div>
-        <div class="date-centered">
-          <span class="lbl">Date:</span>
-          <div class="date-wrapper">
-            <input type="text" class="inp-line text-date" placeholder="Month DD, YYYY">
-            <input type="date" class="picker-date" onchange="formatDate(this)" tabindex="-1" aria-hidden="true">
-            <button type="button" class="picker-btn" onclick="openDatePicker(this)" aria-label="Pick a date" title="Pick a date"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></button>
+
+        <div class="sig-col-item">
+          <div class="sig-input-area" id="sigAreaParent">
+            <input type="text" class="inp-line" placeholder="">
+          </div>
+          <div class="sig-line">Printed Name/Signature of Parent</div>
+          <div class="date-centered">
+            <span class="lbl">Date:</span>
+            <div class="date-wrapper">
+              <input type="text" class="inp-line text-date" placeholder="Month DD, YYYY">
+              <input type="date" class="picker-date" onchange="formatDate(this)" tabindex="-1" aria-hidden="true">
+              <button type="button" class="picker-btn" onclick="openDatePicker(this)" aria-label="Pick a date" title="Pick a date"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Separator Double Line -->
-    <hr class="double-divider">
+      <!-- Separator Double Line -->
+      <hr class="double-divider">
 
-    <!-- University Coordinator Section -->
-    <div class="coord-header">To be accomplished by the University Coordinator (if applicable)</div>
-    
-    <div class="recommendation-block">
-      <div class="form-row">
-        <span class="lbl">Recommendation:</span>
-        <input type="text" class="inp-line">
-      </div>
-      <div class="form-row" style="margin-top: 8px;">
-        <input type="text" class="inp-line">
-      </div>
-    </div>
-
-    <div class="coord-sig-wrapper">
-      <div class="coord-sig-box">
-        <div class="sig-input-area" id="sigAreaCoord" style="width: 100%;">
-          <input type="text" class="inp-line" placeholder="">
+      <!-- University Coordinator Section -->
+      <div class="coord-header">To be accomplished by the University Coordinator (if applicable)</div>
+      
+      <div class="recommendation-block">
+        <div class="form-row">
+          <span class="lbl">Recommendation:</span>
+          <input type="text" class="inp-line">
         </div>
-        <div class="sig-line">Printed Name/Signature of University Coordinator</div>
-        <div class="coord-date-row">
-          <span class="lbl">Date:</span>
-          <div class="date-wrapper">
-            <input type="text" class="inp-line text-date" placeholder="Month DD, YYYY">
-            <input type="date" class="picker-date" onchange="formatDate(this)" tabindex="-1" aria-hidden="true">
-            <button type="button" class="picker-btn" onclick="openDatePicker(this)" aria-label="Pick a date" title="Pick a date"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></button>
+        <div class="form-row" style="margin-top: 8px;">
+          <input type="text" class="inp-line">
+        </div>
+      </div>
+
+      <div class="coord-sig-wrapper">
+        <div class="coord-sig-box">
+          <div class="sig-input-area" id="sigAreaCoord" style="width: 100%;">
+            <input type="text" class="inp-line" placeholder="">
+          </div>
+          <div class="sig-line">Printed Name/Signature of University Coordinator</div>
+          <div class="coord-date-row">
+            <span class="lbl">Date:</span>
+            <div class="date-wrapper">
+              <input type="text" class="inp-line text-date" placeholder="Month DD, YYYY">
+              <input type="date" class="picker-date" onchange="formatDate(this)" tabindex="-1" aria-hidden="true">
+              <button type="button" class="picker-btn" onclick="openDatePicker(this)" aria-label="Pick a date" title="Pick a date"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </form>
+    </form>
+  </div>
+
+  <!-- Action Buttons Toolbar (Right Side) -->
+  <div class="btn-bar" role="toolbar" aria-label="Form actions">
+    <button type="button" class="btn btn-secondary" onclick="triggerImageUpload()" title="Upload pictures or signatures. You can also drop images onto the form, drag to move, pull the corner to resize, and use the top round handle to rotate." aria-label="Upload pictures or signatures">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      <span class="btn-label">UPLOAD</span>
+    </button>
+    <button type="button" class="btn" onclick="window.print()" title="Print or save the form as a PDF" aria-label="Print or download as PDF">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      <span class="btn-label">PRINT/<wbr>DOWNLOAD</span>
+    </button>
+  </div>
 </div>
 
 <!-- Hidden File Input for Image Uploads -->
@@ -1409,22 +1462,35 @@
     resizeHandle.className = 'resize-handle';
     resizeHandle.title = 'Drag to resize';
 
+    const rotateHandle = document.createElement('div');
+    rotateHandle.className = 'rotate-handle';
+    rotateHandle.title = 'Drag to rotate (hold Shift to snap to 15°, double-click to reset)';
+    rotateHandle.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 3 21 9 15 9"/></svg>';
+
     wrapper.appendChild(img);
     wrapper.appendChild(delBtn);
     wrapper.appendChild(resizeHandle);
+    wrapper.appendChild(rotateHandle);
     wrapper.style.top = topPos + 'px';
     wrapper.style.left = leftPos + 'px';
     paper.appendChild(wrapper);
 
-    makeElementInteractive(wrapper, resizeHandle);
+    makeElementInteractive(wrapper, resizeHandle, rotateHandle);
     deselectAllExcept(wrapper);
   }
 
-  function makeElementInteractive(elmnt, resizeHandle) {
+  function makeElementInteractive(elmnt, resizeHandle, rotateHandle) {
+    const getRot = () => parseFloat(elmnt.dataset.rot || '0') || 0;
+    function setRot(deg) {
+      deg = ((deg + 180) % 360 + 360) % 360 - 180;
+      elmnt.dataset.rot = String(deg);
+      elmnt.style.setProperty('--rot', deg + 'deg');
+    }
+
     let startX, startY, origLeft, origTop, dragging = false;
 
     elmnt.addEventListener('pointerdown', function(e) {
-      if (e.target.classList.contains('btn-delete') || e.target.classList.contains('resize-handle')) return;
+      if (e.target.closest('.btn-delete, .resize-handle, .rotate-handle')) return;
       e.preventDefault();
       deselectAllExcept(elmnt);
       elmnt.classList.add('selected', 'dragging');
@@ -1453,13 +1519,19 @@
       else if (e.key === 'ArrowDown') dy = step;
       else if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); elmnt.remove(); return; }
       else if (e.key === 'Escape') { elmnt.classList.remove('selected'); elmnt.blur(); return; }
+      else if (e.code === 'BracketLeft' || e.code === 'BracketRight') {
+        e.preventDefault();
+        elmnt.classList.add('selected');
+        setRot(getRot() + (e.code === 'BracketRight' ? 1 : -1) * (e.shiftKey ? 15 : 1));
+        return;
+      }
       else return;
       e.preventDefault();
       elmnt.classList.add('selected');
       moveTo(elmnt, elmnt.offsetLeft + dx, elmnt.offsetTop + dy);
     });
 
-    let resizing = false, rStartX, rStartW, rRatio;
+    let resizing = false, rStartX, rStartY, rStartW, rRatio;
 
     resizeHandle.addEventListener('pointerdown', function(e) {
       e.preventDefault();
@@ -1467,6 +1539,7 @@
       resizing = true;
       resizeHandle.setPointerCapture(e.pointerId);
       rStartX = e.clientX;
+      rStartY = e.clientY;
       rStartW = elmnt.offsetWidth;
       rRatio = elmnt.offsetWidth / Math.max(1, elmnt.offsetHeight);
     });
@@ -1475,7 +1548,9 @@
       if (!resizing) return;
       const maxW = Math.min(paper.clientWidth - elmnt.offsetLeft,
                             (paper.offsetHeight - elmnt.offsetTop) * rRatio);
-      const w = clamp(rStartW + (e.clientX - rStartX), 24, maxW);
+      const a = getRot() * Math.PI / 180;
+      const delta = (e.clientX - rStartX) * Math.cos(a) + (e.clientY - rStartY) * Math.sin(a);
+      const w = clamp(rStartW + delta, 24, maxW);
       elmnt.style.width = w + 'px';
       elmnt.style.height = (w / rRatio) + 'px';
     });
@@ -1483,6 +1558,28 @@
     function stopResize() { resizing = false; }
     resizeHandle.addEventListener('pointerup', stopResize);
     resizeHandle.addEventListener('pointercancel', stopResize);
+
+    let rotating = false;
+    rotateHandle.addEventListener('pointerdown', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      deselectAllExcept(elmnt);
+      elmnt.classList.add('selected');
+      rotating = true;
+      rotateHandle.setPointerCapture(e.pointerId);
+    });
+    rotateHandle.addEventListener('pointermove', function(e) {
+      if (!rotating) return;
+      const r = elmnt.getBoundingClientRect();
+      const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+      let deg = Math.atan2(e.clientY - cy, e.clientX - cx) * 180 / Math.PI + 90;
+      if (e.shiftKey) deg = Math.round(deg / 15) * 15;
+      setRot(deg);
+    });
+    function stopRotate() { rotating = false; }
+    rotateHandle.addEventListener('pointerup', stopRotate);
+    rotateHandle.addEventListener('pointercancel', stopRotate);
+    rotateHandle.addEventListener('dblclick', function(e) { e.stopPropagation(); setRot(0); });
   }
 
   function deselectAllExcept(target) {
